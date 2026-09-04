@@ -49,12 +49,13 @@ function renderBingoBoard(){
   if(!bingoPlayer)return;
   document.querySelector("#bingoPlayerName").textContent=bingoPlayer.name;
   bingoEls.board.innerHTML="";
+  const newestMissed=[...bingoDrawn.slice(0,-1)].reverse().find(number=>bingoPlayer.card.includes(number)&&!bingoPlayer.marked.includes(number));
   bingoPlayer.card.forEach(number=>{
     const button=document.createElement("button");
     button.type="button";button.textContent=number;
     const isMarked=bingoPlayer.marked.includes(number);
     const isMissed=bingoDrawn.slice(0,-1).includes(number)&&!isMarked;
-    button.className=isMarked?"marked":isMissed?"missed":"";
+    button.className=isMarked?"marked":isMissed?`missed${number===newestMissed?" newest-missed":""}`:"";
     button.disabled=bingoPlayer.marked.includes(number);
     button.addEventListener("click",()=>markBingo(number));
     bingoEls.board.append(button);
