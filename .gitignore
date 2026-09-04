@@ -1,0 +1,10 @@
+.DS_Store
+.vercel
+tmp/
+output/
+*.mp4
+*.gif
+artlist-preview.png
+yehonathan-artlist-preview.png
+yehonathan-tv-canvas-4k.png
+yehonathan-squishy-birthday-tv.png
