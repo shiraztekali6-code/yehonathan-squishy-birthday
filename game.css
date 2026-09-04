@@ -45,7 +45,7 @@ button.secondary{margin-top:28px;background:transparent;border:2px solid var(--c
 .bingo-player{display:flex;justify-content:center;gap:10px;font-size:22px}.bingo-player strong{color:var(--pink)}
 .bingo-board{max-width:600px;margin:28px auto;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;direction:ltr}
 .bingo-board button{aspect-ratio:1;padding:0;border-radius:18px;background:#1b1028;color:#8c7a9c;font:900 clamp(18px,4vw,28px) Heebo;box-shadow:none;border:2px solid transparent;transition:.2s}
-.bingo-board button.drawn{color:white;border-color:var(--cyan);background:#0b5364;box-shadow:0 0 18px #22dcff55;cursor:pointer;opacity:1}
+.bingo-board button:not(.marked){color:white;border-color:#ffffff20;cursor:pointer;opacity:1}.bingo-board button:not(.marked):active{border-color:var(--cyan);transform:scale(.94)}
 .bingo-board button.marked{color:#071007;border-color:var(--lime);background:var(--lime);box-shadow:0 0 25px #97ff4577;transform:scale(.92)}
 .bingo-help{font-size:15px!important}.bingo-winner{padding-block:80px}.bingo-winner p{color:var(--lime);font-weight:900}.bingo-winner h3{font-size:clamp(60px,12vw,120px);color:var(--pink);text-shadow:0 0 30px var(--pink)}.bingo-winner>strong{color:var(--cyan);font-size:25px}
 @keyframes bingoSpin{to{transform:rotate(360deg)}}

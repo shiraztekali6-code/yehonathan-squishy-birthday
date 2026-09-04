@@ -17,7 +17,7 @@ bingoSection.innerHTML=`
       <form id="bingoJoinForm"><label for="bingoName">השם שלי</label><input id="bingoName" maxlength="30" autocomplete="name" required placeholder="למשל: נועה"><button type="submit">קבלת לוח</button></form>
       <p class="game-message" id="bingoMessage"></p>
     </div>
-    <div class="bingo-panel" id="bingoBoardPanel"><div class="bingo-player"><span>הלוח של</span><strong id="bingoPlayerName"></strong></div><div class="bingo-board" id="bingoBoard"></div><p class="bingo-help">מספר מואר כבר הוגרל — לחצו עליו כדי לסמן ✓</p></div>
+    <div class="bingo-panel" id="bingoBoardPanel"><div class="bingo-player"><span>הלוח של</span><strong id="bingoPlayerName"></strong></div><div class="bingo-board" id="bingoBoard"></div><p class="bingo-help">המספרים אינם מסומנים אוטומטית — מצאו בעצמכם את המספר שהוגרל ולחצו עליו ✓</p></div>
     <div class="bingo-panel bingo-winner" id="bingoWinner"><p>🎉 בינגו! 🎉</p><h3 id="bingoWinnerName"></h3><strong>יש לנו זוכה בסקווישי!</strong></div>
   </div>`;
 document.querySelector("#rules").before(bingoSection);
@@ -44,8 +44,8 @@ function renderBingoBoard(){
   bingoPlayer.card.forEach(number=>{
     const button=document.createElement("button");
     button.type="button";button.textContent=number;
-    button.className=(bingoDrawn.includes(number)?"drawn ":"")+(bingoPlayer.marked.includes(number)?"marked":"");
-    button.disabled=!bingoDrawn.includes(number)||bingoPlayer.marked.includes(number);
+    button.className=bingoPlayer.marked.includes(number)?"marked":"";
+    button.disabled=bingoPlayer.marked.includes(number);
     button.addEventListener("click",()=>markBingo(number));
     bingoEls.board.append(button);
   });
