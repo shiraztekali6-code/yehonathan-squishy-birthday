@@ -9,6 +9,8 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
+    { "src": "/cipher/?", "dest": "/index.html" },
+    { "src": "/bingo/?", "dest": "/index.html" },
     { "src": "/", "dest": "/index.html" },
     { "handle": "filesystem" }
   ]

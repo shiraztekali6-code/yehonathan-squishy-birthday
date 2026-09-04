@@ -6,7 +6,27 @@ addEventListener("resize",resize);resize();
 function burst(){pieces=Array.from({length:180},()=>({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*18,vy:-Math.random()*15-5,g:.25+Math.random()*.15,r:3+Math.random()*7,c:["#ff2bd6","#22dcff","#97ff45","#ff9b28","#fff"][Math.floor(Math.random()*5)],a:1}));requestAnimationFrame(draw)}
 function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.a-=.006;ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.c;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.y*.02);ctx.fillRect(-p.r,-p.r,p.r*2,p.r);ctx.restore()});pieces=pieces.filter(p=>p.a>0&&p.y<innerHeight+30);if(pieces.length)requestAnimationFrame(draw)}
 document.querySelectorAll("#partyButton,#finalButton").forEach(b=>b.addEventListener("click",burst));
-document.querySelector("#partyButton").addEventListener("click",()=>document.querySelector("#cipher").scrollIntoView({behavior:"smooth"}));
+document.querySelector("#partyButton").addEventListener("click",()=>document.querySelector(".games").scrollIntoView({behavior:"smooth"}));
+
+const gameGrid=document.querySelector(".games .cards");
+const cipherCard=[...gameGrid.querySelectorAll("article")].find(card=>card.querySelector("h3")?.textContent==="כתב סתרים");
+const bingoCard=document.createElement("article");
+bingoCard.innerHTML='<i>07</i><div class="icon">🎱</div><h3>בינגו סקווישי</h3><p>לוח אישי בטלפון והגרלה חיה של מספרים מ־1 עד 100.</p>';
+gameGrid.append(bingoCard);
+[[cipherCard,"/cipher"],[bingoCard,"/bingo"]].forEach(([card,url])=>{
+  card.classList.add("game-link");card.tabIndex=0;card.setAttribute("role","link");
+  card.addEventListener("click",()=>location.href=url);
+  card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();location.href=url}});
+});
+
+const gamePath=location.pathname.replace(/\/$/,"");
+const isCipherPage=gamePath==="/cipher";
+if(!isCipherPage)document.querySelector("#cipher").hidden=true;
+if(isCipherPage){
+  document.body.classList.add("game-route");
+  document.querySelectorAll("header,.flow,.games,.rules,.finale,footer").forEach(element=>element.hidden=true);
+  document.querySelector("#cipher").insertAdjacentHTML("afterbegin",'<a class="game-back" href="/">← חזרה לכל המשחקים</a>');
+}
 
 const panels={join:document.querySelector("#joinPanel"),puzzle:document.querySelector("#puzzlePanel"),winner:document.querySelector("#winnerPanel")};
 const joinForm=document.querySelector("#joinForm");

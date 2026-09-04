@@ -22,6 +22,14 @@ bingoSection.innerHTML=`
   </div>`;
 document.querySelector("#rules").before(bingoSection);
 document.querySelector("#rules .section-title>span").textContent="05";
+const isBingoPage=location.pathname.replace(/\/$/,"")==="/bingo";
+if(!isBingoPage)bingoSection.hidden=true;
+if(isBingoPage){
+  document.body.classList.add("game-route");
+  document.querySelectorAll("header,.flow,.games,.cipher,.rules,.finale,footer").forEach(element=>element.hidden=true);
+  bingoSection.hidden=false;
+  bingoSection.insertAdjacentHTML("afterbegin",'<a class="game-back" href="/">← חזרה לכל המשחקים</a>');
+}
 
 const bingoAdmin=new URLSearchParams(location.search).has("admin");
 const bingoEls={
