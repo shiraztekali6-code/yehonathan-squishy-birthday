@@ -45,9 +45,16 @@ function send(res, status, body) {
 
 export default async function handler(req, res) {
   try {
+    let storedRound = await redis("GET", `${baseKey}:round`);
+    if (!storedRound) {
+      await redis("SET", `${baseKey}:round`, 1, "NX");
+      storedRound = await redis("GET", `${baseKey}:round`);
+    }
+    const round = Number(storedRound);
+    const roundKey = `${baseKey}:round:${round}`;
     if (req.method === "GET") {
-      const winner = await redis("GET", `${baseKey}:winner`);
-      return send(res, 200, { winner: winner ? JSON.parse(winner) : null });
+      const winner = await redis("GET", `${roundKey}:winner`);
+      return send(res, 200, { round, winner: winner ? JSON.parse(winner) : null });
     }
 
     if (req.method !== "POST") return send(res, 405, { error: "Method not allowed" });
@@ -56,14 +63,14 @@ export default async function handler(req, res) {
     if (action === "join") {
       const name = cleanName(req.body?.name);
       if (name.length < 2) return send(res, 400, { error: "נא להכניס שם של לפחות שתי אותיות" });
-      const saved = await redis("GET", `${baseKey}:player:${name}`);
+      const saved = await redis("GET", `${roundKey}:player:${name}`);
       if (saved) return send(res, 200, JSON.parse(saved));
 
       const start = Math.floor(Math.random() * phrases.length);
       let card = null;
       for (let offset = 0; offset < phrases.length; offset += 1) {
         const candidate = (start + offset) % phrases.length;
-        if (await redis("SADD", `${baseKey}:used`, candidate)) {
+        if (await redis("SADD", `${roundKey}:used`, candidate)) {
           card = candidate;
           break;
         }
@@ -73,25 +80,28 @@ export default async function handler(req, res) {
       const map = keyFor(card);
       const phrase = phrases[card];
       const player = {
-        name, card: card + 1,
+        name, card: card + 1, round,
         cipher: [...phrase].map(char => char === " " ? " / " : map[char]).join(" "),
         key: Object.entries(map).map(([letter, symbol]) => ({ letter, symbol }))
       };
-      await redis("SET", `${baseKey}:player:${name}`, JSON.stringify(player));
+      await redis("SET", `${roundKey}:player:${name}`, JSON.stringify(player));
       return send(res, 200, player);
     }
 
     if (action === "submit") {
       const name = cleanName(req.body?.name);
-      const playerRaw = await redis("GET", `${baseKey}:player:${name}`);
+      if (Number(req.body?.round) !== round) {
+        return send(res, 409, { error: "המשחק אופס — יש להגריל כרטיס חדש", reset: true });
+      }
+      const playerRaw = await redis("GET", `${roundKey}:player:${name}`);
       if (!playerRaw) return send(res, 404, { error: "הכרטיס לא נמצא. התחברו מחדש." });
       const player = JSON.parse(playerRaw);
       if (normalize(req.body?.answer) !== normalize(phrases[player.card - 1])) {
         return send(res, 400, { error: "עוד לא — נסו שוב!" });
       }
       const candidate = { name: player.name, card: player.card, wonAt: Date.now() };
-      const claimed = await redis("SET", `${baseKey}:winner`, JSON.stringify(candidate), "NX");
-      const winnerRaw = claimed ? JSON.stringify(candidate) : await redis("GET", `${baseKey}:winner`);
+      const claimed = await redis("SET", `${roundKey}:winner`, JSON.stringify(candidate), "NX");
+      const winnerRaw = claimed ? JSON.stringify(candidate) : await redis("GET", `${roundKey}:winner`);
       return send(res, 200, { correct: true, winner: JSON.parse(winnerRaw), claimed: Boolean(claimed) });
     }
 
@@ -99,8 +109,8 @@ export default async function handler(req, res) {
       if (!process.env.ADMIN_CODE || req.body?.code !== process.env.ADMIN_CODE) {
         return send(res, 403, { error: "קוד מארחת שגוי" });
       }
-      await redis("DEL", `${baseKey}:winner`, `${baseKey}:used`);
-      return send(res, 200, { reset: true });
+      const nextRound = await redis("INCR", `${baseKey}:round`);
+      return send(res, 200, { reset: true, round: Number(nextRound) });
     }
 
     return send(res, 400, { error: "פעולה לא מוכרת" });

@@ -14,15 +14,20 @@ const answerForm=document.querySelector("#answerForm");
 const joinMessage=document.querySelector("#joinMessage");
 const answerMessage=document.querySelector("#answerMessage");
 let player=JSON.parse(localStorage.getItem("squishyPlayer")||"null");
+const isAdmin=new URLSearchParams(location.search).has("admin");
+if(isAdmin){
+  document.body.classList.add("admin-mode");
+  document.querySelector(".game-shell").insertAdjacentHTML("afterbegin",'<aside class="admin-console"><div><span>מצב מארחת</span><strong>לוח ניהול המשחק</strong><small id="adminStatus">המשחק פעיל</small></div></aside>');
+}
 function showPanel(name){Object.entries(panels).forEach(([key,panel])=>panel.classList.toggle("active",key===name))}
 function showPlayer(data){player=data;localStorage.setItem("squishyPlayer",JSON.stringify(data));document.querySelector("#cardNumber").textContent=`כרטיס ${String(data.card).padStart(2,"0")}`;document.querySelector("#playerGreeting").textContent=`בהצלחה, ${data.name}!`;document.querySelector("#cipherText").textContent=data.cipher;document.querySelector("#symbolKey").innerHTML=data.key.map(item=>`<span><b>${item.symbol}</b><i>=</i><strong>${item.letter}</strong></span>`).join("");showPanel("puzzle")}
 function showWinner(winner){document.querySelector("#winnerName").textContent=winner.name;showPanel("winner");burst()}
 async function api(body){const response=await fetch("/api/game",{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw new Error(data.error||"משהו השתבש");return data}
 joinForm.addEventListener("submit",async event=>{event.preventDefault();joinMessage.textContent="מגרילים לך כרטיס...";const button=joinForm.querySelector("button");button.disabled=true;try{showPlayer(await api({action:"join",name:document.querySelector("#playerName").value}))}catch(error){joinMessage.textContent=error.message}finally{button.disabled=false}});
-answerForm.addEventListener("submit",async event=>{event.preventDefault();answerMessage.textContent="בודקים...";try{const result=await api({action:"submit",name:player.name,answer:document.querySelector("#answerInput").value});if(result.winner)showWinner(result.winner)}catch(error){answerMessage.textContent=error.message}});
+answerForm.addEventListener("submit",async event=>{event.preventDefault();answerMessage.textContent="בודקים...";try{const result=await api({action:"submit",name:player.name,round:player.round,answer:document.querySelector("#answerInput").value});if(result.winner)showWinner(result.winner)}catch(error){answerMessage.textContent=error.message}});
 const resetButton=document.querySelector("#resetGame");
-if(new URLSearchParams(location.search).has("admin"))resetButton.hidden=false;
-resetButton.addEventListener("click",async()=>{const code=prompt("הכניסי את קוד המארחת");if(!code)return;try{await api({action:"reset",code});localStorage.removeItem("squishyPlayer");location.href=location.pathname}catch(error){alert(error.message)}});
-async function checkWinner(){try{const state=await api();if(state.winner&&!panels.winner.classList.contains("active"))showWinner(state.winner)}catch{}}
+if(isAdmin){resetButton.hidden=false;resetButton.textContent="איפוס המשחק ופתיחת סבב חדש";document.querySelector(".admin-console").append(resetButton)}
+resetButton.addEventListener("click",async()=>{const code=prompt("הכניסי את קוד המארחת");if(!code)return;try{await api({action:"reset",code});localStorage.removeItem("squishyPlayer");player=null;document.querySelector("#playerName").value="";joinMessage.textContent="המשחק אופס. כולם יכולים להגריל כרטיס חדש.";showPanel("join");const status=document.querySelector("#adminStatus");if(status)status.textContent="סבב חדש נפתח ✓"}catch(error){alert(error.message)}});
+async function checkWinner(){try{const state=await api();if(player&&state.round!==player.round){localStorage.removeItem("squishyPlayer");player=null;document.querySelector("#answerInput").value="";joinMessage.textContent="נפתח סבב חדש — הגרילו כרטיס מחדש.";showPanel("join")}else if(state.winner&&!panels.winner.classList.contains("active"))showWinner(state.winner)}catch{}}
 if(player?.name&&player?.cipher&&player?.key)showPlayer(player);
 checkWinner();setInterval(checkWinner,2000);

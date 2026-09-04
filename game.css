@@ -23,4 +23,8 @@
 .winner-panel h3{font-size:clamp(60px,12vw,120px);color:var(--pink);text-shadow:0 0 30px var(--pink)}
 .winner-panel>strong{display:block;font-size:25px;color:var(--cyan)}
 button.secondary{margin-top:28px;background:transparent;border:2px solid var(--cyan);box-shadow:none;color:var(--cyan)}
+.admin-mode .game-shell{border:2px solid var(--lime);box-shadow:0 0 70px #97ff4533}
+.admin-console{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-bottom:14px;padding:18px 22px;border-radius:20px;background:linear-gradient(90deg,#17310f,#102827);text-align:right}
+.admin-console div{display:grid}.admin-console span{color:var(--lime);font-weight:900;letter-spacing:2px}.admin-console strong{font-size:24px}.admin-console small{color:#cdbedd}.admin-console button{margin:0;width:auto}
 @media(max-width:600px){.game-shell{padding:8px;border-radius:22px}.game-panel{padding:30px 16px}.game-status span:last-child{display:none}.card-heading{flex-direction:column;gap:2px}.symbol-key{grid-template-columns:repeat(4,1fr)}.cipher-text{padding:18px 10px;letter-spacing:3px}.game-panel button{width:100%}}
+@media(max-width:600px){.admin-console{flex-direction:column;align-items:stretch}.admin-console button{width:100%}}
