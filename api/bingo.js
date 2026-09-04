@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       const drawnRaw = await redis("GET", `${roundKey}:drawn`);
       const drawn = drawnRaw ? JSON.parse(drawnRaw) : [];
       if (!player.card.includes(number) || !drawn.includes(number)) {
-        return send(res, 400, { error: "אפשר לסמן רק מספר שכבר הוגרל" });
+        return send(res, 400, { error: "מנסה לרמות הא?! לא במשמרת הסקווישיז!" });
       }
       player.marked = [...new Set([...player.marked, number])];
       await redis("SET", key, JSON.stringify(player));
