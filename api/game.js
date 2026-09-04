@@ -42,7 +42,7 @@ const phrases = [
 ];
 
 const symbols = ["●","○","◆","◇","▲","△","■","□","★","☆","♥","♠","♣","☀","☂","☁","☾","✦","✿","⬟","⬢","⬣","⬤","◐","◒","◈","◎","⊕","⌂","♜","♞","⚑"];
-const letters = [...new Set(phrases.join("").replace(/\s/g, ""))];
+const letters = [..."אבגדהוזחטיכךלמםנןסעפףצץקרשת"];
 const baseKey = "squishy:birthday:v1";
 
 function keyFor(card) {
