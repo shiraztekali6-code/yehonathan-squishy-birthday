@@ -8,12 +8,17 @@ function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>
 document.querySelectorAll("#partyButton,#finalButton").forEach(b=>b.addEventListener("click",burst));
 document.querySelector("#partyButton").addEventListener("click",()=>document.querySelector(".games").scrollIntoView({behavior:"smooth"}));
 
+const siteAdmin=new URLSearchParams(location.search).has("admin");
+if(siteAdmin&&location.pathname==="/"){
+  document.querySelector(".games .section-title").insertAdjacentHTML("afterend",'<div class="site-admin-banner"><span>מצב מארחת פעיל</span><strong>בחרי משחק לניהול</strong><small>ההרשאה תישמר במעבר בין המשחקים</small></div>');
+}
 const gameGrid=document.querySelector(".games .cards");
 const cipherCard=[...gameGrid.querySelectorAll("article")].find(card=>card.querySelector("h3")?.textContent==="כתב סתרים");
 const bingoCard=document.createElement("article");
 bingoCard.innerHTML='<i>07</i><div class="icon">🎱</div><h3>בינגו סקווישי</h3><p>לוח אישי בטלפון והגרלה חיה של מספרים מ־1 עד 100.</p>';
 gameGrid.append(bingoCard);
-[[cipherCard,"/cipher"],[bingoCard,"/bingo"]].forEach(([card,url])=>{
+[[cipherCard,"/cipher"],[bingoCard,"/bingo"]].forEach(([card,path])=>{
+  const url=path+(siteAdmin?"?admin=1":"");
   card.classList.add("game-link");card.tabIndex=0;card.setAttribute("role","link");
   card.addEventListener("click",()=>location.href=url);
   card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();location.href=url}});
@@ -25,7 +30,7 @@ if(!isCipherPage)document.querySelector("#cipher").hidden=true;
 if(isCipherPage){
   document.body.classList.add("game-route");
   document.querySelectorAll("header,.flow,.games,.rules,.finale,footer").forEach(element=>element.hidden=true);
-  document.querySelector("#cipher").insertAdjacentHTML("afterbegin",'<a class="game-back" href="/">← חזרה לכל המשחקים</a>');
+  document.querySelector("#cipher").insertAdjacentHTML("afterbegin",`<a class="game-back" href="/${siteAdmin?"?admin=1":""}">← חזרה לכל המשחקים</a>`);
 }
 
 const panels={join:document.querySelector("#joinPanel"),puzzle:document.querySelector("#puzzlePanel"),winner:document.querySelector("#winnerPanel")};
@@ -35,7 +40,7 @@ const joinMessage=document.querySelector("#joinMessage");
 const answerMessage=document.querySelector("#answerMessage");
 document.querySelector("#joinPanel>p").textContent="הכניסו שם ופתרו את כתב החידה. הראשונ/ה לפתור יזכו בסקווישי הנכסף!";
 let player=JSON.parse(localStorage.getItem("squishyPlayer")||"null");
-const isAdmin=new URLSearchParams(location.search).has("admin");
+const isAdmin=siteAdmin;
 if(isAdmin){
   document.body.classList.add("admin-mode");
   document.querySelector(".game-shell").insertAdjacentHTML("afterbegin",'<aside class="admin-console"><div><span>מצב מארחת</span><strong>לוח ניהול המשחק</strong><small id="adminStatus">המשחק פעיל</small></div></aside>');

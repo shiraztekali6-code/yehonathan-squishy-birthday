@@ -28,7 +28,7 @@ if(isBingoPage){
   document.body.classList.add("game-route");
   document.querySelectorAll("header,.flow,.games,.cipher,.rules,.finale,footer").forEach(element=>element.hidden=true);
   bingoSection.hidden=false;
-  bingoSection.insertAdjacentHTML("afterbegin",'<a class="game-back" href="/">← חזרה לכל המשחקים</a>');
+  bingoSection.insertAdjacentHTML("afterbegin",`<a class="game-back" href="/${new URLSearchParams(location.search).has("admin")?"?admin=1":""}">← חזרה לכל המשחקים</a>`);
 }
 
 const bingoAdmin=new URLSearchParams(location.search).has("admin");
