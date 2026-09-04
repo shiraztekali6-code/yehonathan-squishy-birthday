@@ -1,1 +1,28 @@
-const canvas=document.querySelector('#confetti'),ctx=canvas.getContext('2d');let pieces=[];function resize(){canvas.width=innerWidth;canvas.height=innerHeight}addEventListener('resize',resize);resize();function burst(){pieces=Array.from({length:180},()=>({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*18,vy:-Math.random()*15-5,g:.25+Math.random()*.15,r:3+Math.random()*7,c:['#ff2bd6','#22dcff','#97ff45','#ff9b28','#fff'][Math.floor(Math.random()*5)],a:1}));requestAnimationFrame(draw)}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.a-=.006;ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.c;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.y*.02);ctx.fillRect(-p.r,-p.r,p.r*2,p.r);ctx.restore()});pieces=pieces.filter(p=>p.a>0&&p.y<innerHeight+30);if(pieces.length)requestAnimationFrame(draw)}document.querySelectorAll('#partyButton,#finalButton').forEach(b=>b.addEventListener('click',burst));document.querySelector('#partyButton').addEventListener('click',()=>document.querySelector('#flow').scrollIntoView({behavior:'smooth'}));
+const canvas = document.querySelector("#confetti");
+const ctx = canvas.getContext("2d");
+let pieces = [];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+addEventListener("resize",resize);resize();
+function burst(){pieces=Array.from({length:180},()=>({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*18,vy:-Math.random()*15-5,g:.25+Math.random()*.15,r:3+Math.random()*7,c:["#ff2bd6","#22dcff","#97ff45","#ff9b28","#fff"][Math.floor(Math.random()*5)],a:1}));requestAnimationFrame(draw)}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.a-=.006;ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.c;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.y*.02);ctx.fillRect(-p.r,-p.r,p.r*2,p.r);ctx.restore()});pieces=pieces.filter(p=>p.a>0&&p.y<innerHeight+30);if(pieces.length)requestAnimationFrame(draw)}
+document.querySelectorAll("#partyButton,#finalButton").forEach(b=>b.addEventListener("click",burst));
+document.querySelector("#partyButton").addEventListener("click",()=>document.querySelector("#cipher").scrollIntoView({behavior:"smooth"}));
+
+const panels={join:document.querySelector("#joinPanel"),puzzle:document.querySelector("#puzzlePanel"),winner:document.querySelector("#winnerPanel")};
+const joinForm=document.querySelector("#joinForm");
+const answerForm=document.querySelector("#answerForm");
+const joinMessage=document.querySelector("#joinMessage");
+const answerMessage=document.querySelector("#answerMessage");
+let player=JSON.parse(localStorage.getItem("squishyPlayer")||"null");
+function showPanel(name){Object.entries(panels).forEach(([key,panel])=>panel.classList.toggle("active",key===name))}
+function showPlayer(data){player=data;localStorage.setItem("squishyPlayer",JSON.stringify(data));document.querySelector("#cardNumber").textContent=`כרטיס ${String(data.card).padStart(2,"0")}`;document.querySelector("#playerGreeting").textContent=`בהצלחה, ${data.name}!`;document.querySelector("#cipherText").textContent=data.cipher;document.querySelector("#symbolKey").innerHTML=data.key.map(item=>`<span><b>${item.symbol}</b><i>=</i><strong>${item.letter}</strong></span>`).join("");showPanel("puzzle")}
+function showWinner(winner){document.querySelector("#winnerName").textContent=winner.name;showPanel("winner");burst()}
+async function api(body){const response=await fetch("/api/game",{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw new Error(data.error||"משהו השתבש");return data}
+joinForm.addEventListener("submit",async event=>{event.preventDefault();joinMessage.textContent="מגרילים לך כרטיס...";const button=joinForm.querySelector("button");button.disabled=true;try{showPlayer(await api({action:"join",name:document.querySelector("#playerName").value}))}catch(error){joinMessage.textContent=error.message}finally{button.disabled=false}});
+answerForm.addEventListener("submit",async event=>{event.preventDefault();answerMessage.textContent="בודקים...";try{const result=await api({action:"submit",name:player.name,answer:document.querySelector("#answerInput").value});if(result.winner)showWinner(result.winner)}catch(error){answerMessage.textContent=error.message}});
+const resetButton=document.querySelector("#resetGame");
+if(new URLSearchParams(location.search).has("admin"))resetButton.hidden=false;
+resetButton.addEventListener("click",async()=>{const code=prompt("הכניסי את קוד המארחת");if(!code)return;try{await api({action:"reset",code});localStorage.removeItem("squishyPlayer");location.href=location.pathname}catch(error){alert(error.message)}});
+async function checkWinner(){try{const state=await api();if(state.winner&&!panels.winner.classList.contains("active"))showWinner(state.winner)}catch{}}
+if(player?.name&&player?.cipher&&player?.key)showPlayer(player);
+checkWinner();setInterval(checkWinner,2000);
