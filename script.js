@@ -46,7 +46,16 @@ if(isAdmin){
   document.querySelector(".game-shell").insertAdjacentHTML("afterbegin",'<aside class="admin-console"><div><span>מצב מארחת</span><strong>לוח ניהול המשחק</strong><small id="adminStatus">המשחק פעיל</small></div></aside>');
 }
 function showPanel(name){Object.entries(panels).forEach(([key,panel])=>panel.classList.toggle("active",key===name))}
-function showPlayer(data){player=data;localStorage.setItem("squishyPlayer",JSON.stringify(data));document.querySelector("#cardNumber").textContent=`כרטיס ${String(data.card).padStart(2,"0")}`;document.querySelector("#playerGreeting").textContent=`בהצלחה, ${data.name}!`;document.querySelector("#cipherText").textContent=data.cipher;document.querySelector("#symbolKey").innerHTML=data.key.map(item=>`<span><b>${item.symbol}</b><i>=</i><strong>${item.letter}</strong></span>`).join("");showPanel("puzzle")}
+function renderCipher(cipher){
+  const container=document.querySelector("#cipherText");container.textContent="";
+  cipher.split(" / ").forEach((word,index,words)=>{
+    const wordElement=document.createElement("span");wordElement.className="cipher-word";
+    word.trim().split(/\s+/).forEach(symbol=>{const symbolElement=document.createElement("span");symbolElement.textContent=symbol;wordElement.append(symbolElement)});
+    container.append(wordElement);
+    if(index<words.length-1){const divider=document.createElement("b");divider.className="cipher-divider";divider.textContent="/";container.append(divider)}
+  });
+}
+function showPlayer(data){player=data;localStorage.setItem("squishyPlayer",JSON.stringify(data));document.querySelector("#cardNumber").textContent=`כרטיס ${String(data.card).padStart(2,"0")}`;document.querySelector("#playerGreeting").textContent=`בהצלחה, ${data.name}!`;renderCipher(data.cipher);document.querySelector("#symbolKey").innerHTML=data.key.map(item=>`<span><b>${item.symbol}</b><i>=</i><strong>${item.letter}</strong></span>`).join("");showPanel("puzzle")}
 function showWinner(winner){document.querySelector("#winnerName").textContent=winner.name;showPanel("winner");burst()}
 async function api(body){const response=await fetch("/api/game",{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw new Error(data.error||"משהו השתבש");return data}
 joinForm.addEventListener("submit",async event=>{event.preventDefault();joinMessage.textContent="מגרילים לך כרטיס...";const button=joinForm.querySelector("button");button.disabled=true;try{showPlayer(await api({action:"join",name:document.querySelector("#playerName").value}))}catch(error){joinMessage.textContent=error.message}finally{button.disabled=false}});
