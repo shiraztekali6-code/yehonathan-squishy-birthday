@@ -13,6 +13,7 @@ const joinForm=document.querySelector("#joinForm");
 const answerForm=document.querySelector("#answerForm");
 const joinMessage=document.querySelector("#joinMessage");
 const answerMessage=document.querySelector("#answerMessage");
+document.querySelector("#joinPanel>p").textContent="הכניסו שם. לכל משתתף יוגרל כרטיס אחר מתוך 40 גרסאות.";
 let player=JSON.parse(localStorage.getItem("squishyPlayer")||"null");
 const isAdmin=new URLSearchParams(location.search).has("admin");
 if(isAdmin){
