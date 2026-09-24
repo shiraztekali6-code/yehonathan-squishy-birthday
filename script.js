@@ -14,11 +14,15 @@ if(siteAdmin&&location.pathname==="/"){
 }
 const gameGrid=document.querySelector(".games .cards");
 const cipherCard=[...gameGrid.querySelectorAll("article")].find(card=>card.querySelector("h3")?.textContent==="כתב סתרים");
+gameGrid.querySelectorAll("article").forEach(card=>{if(card!==cipherCard)card.remove()});
+cipherCard.querySelector("i").textContent="01";
 const bingoCard=document.createElement("article");
-bingoCard.innerHTML='<i>07</i><div class="icon">🎱</div><h3>בינגו סקווישי</h3><p>לוח אישי בטלפון והגרלה חיה של מספרים מ־1 עד 100.</p>';
-gameGrid.append(bingoCard);
-[[cipherCard,"/cipher"],[bingoCard,"/bingo"]].forEach(([card,path])=>{
-  const url=path+(siteAdmin?"?admin=1":"");
+bingoCard.innerHTML='<i>02</i><div class="icon">🎱</div><h3>בינגו סקווישי</h3><p>לוח אישי בטלפון והגרלה חיה של מספרים מ־1 עד 100.</p>';
+const triviaCard=document.createElement("article");
+triviaCard.innerHTML='<i>03</i><div class="icon">🧠</div><h3>טריוויה</h3><p>משחק שאלות חגיגי בסגנון Jeopardy.</p>';
+gameGrid.append(bingoCard,triviaCard);
+[[cipherCard,"/cipher",true],[bingoCard,"/bingo",true],[triviaCard,"https://y-jeopardy.vercel.app/",false]].forEach(([card,path,preserveAdmin])=>{
+  const url=path+(preserveAdmin&&siteAdmin?"?admin=1":"");
   card.classList.add("game-link");card.tabIndex=0;card.setAttribute("role","link");
   card.addEventListener("click",()=>location.href=url);
   card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();location.href=url}});
