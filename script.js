@@ -8,6 +8,11 @@ function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>
 document.querySelectorAll("#partyButton,#finalButton").forEach(b=>b.addEventListener("click",burst));
 document.querySelector("#partyButton").addEventListener("click",()=>document.querySelector(".games").scrollIntoView({behavior:"smooth"}));
 
+document.querySelector("#flow .section-title").insertAdjacentHTML("beforebegin",`
+  <div class="opening-video">
+    <iframe src="https://www.youtube-nocookie.com/embed/Z9OKMI0E3QQ?rel=0" title="סרטון פתיחה למסיבת יום ההולדת של יהונתן" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+  </div>`);
+
 const siteAdmin=new URLSearchParams(location.search).has("admin");
 if(siteAdmin&&location.pathname==="/"){
   document.querySelector(".games .section-title").insertAdjacentHTML("afterend",'<div class="site-admin-banner"><span>מצב מארחת פעיל</span><strong>בחרי משחק לניהול</strong><small>ההרשאה תישמר במעבר בין המשחקים</small></div>');
