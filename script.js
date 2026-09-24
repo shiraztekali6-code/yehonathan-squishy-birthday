@@ -37,6 +37,12 @@ if(isCipherPage){
   document.querySelector("#cipher").insertAdjacentHTML("afterbegin",`<a class="game-back" href="/${siteAdmin?"?admin=1":""}">← חזרה לכל המשחקים</a>`);
 }
 
+document.querySelector(".rules .golden-rule").insertAdjacentHTML("beforebegin",`
+  <div class="trade-tutorial">
+    <div class="trade-tutorial-copy"><span>איך עושים טרייד?</span><h3>צפו בהדרכה לפני שמתחילים</h3><p>איך מציעים, מוסיפים סקווישים וסוגרים החלפה רק כששני הצדדים מרוצים.</p><a href="https://vt.tiktok.com/ZSbR9368m/" target="_blank" rel="noopener noreferrer">פתיחה ב־TikTok ↗</a></div>
+    <div class="tiktok-frame"><iframe src="https://www.tiktok.com/player/v1/7617286680864640264?autoplay=0" title="סרטון הדרכה: איך עושים טרייד בסקווישים" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+  </div>`);
+
 const panels={join:document.querySelector("#joinPanel"),puzzle:document.querySelector("#puzzlePanel"),winner:document.querySelector("#winnerPanel")};
 const joinForm=document.querySelector("#joinForm");
 const answerForm=document.querySelector("#answerForm");
