@@ -26,6 +26,15 @@ bingoCard.innerHTML='<i>02</i><div class="icon">🎱</div><h3>בינגו סקו�
 const triviaCard=document.createElement("article");
 triviaCard.innerHTML='<i>03</i><div class="icon">🧠</div><h3>טריוויה</h3><p>משחק שאלות חגיגי בסגנון Jeopardy.</p>';
 gameGrid.append(bingoCard,triviaCard);
+gameGrid.insertAdjacentHTML("afterend",`
+  <div class="all-game-instructions">
+    <h3>איך משחקים?</h3>
+    <div class="instruction-grid">
+      <article><span>🔐 כתב סתרים</span><ol><li>נכנסים מהטלפון ומקלידים שם.</li><li>מקבלים חידה אישית ומפענחים מימין לשמאל בעזרת מפתח הצורות.</li><li>מקלידים את המשפט המלא ושולחים.</li><li>הראשונ/ה עם פתרון מדויק זוכים בסקווישי.</li></ol></article>
+      <article><span>🎱 בינגו סקווישי</span><ol><li>מקלידים שם ומקבלים לוח אישי של 5×5.</li><li>המארחת מגרילה מספרים על המסך המרכזי.</li><li>מוצאים כל מספר בלוח ולוחצים עליו בעצמכם.</li><li>שורה, טור או אלכסון מלאים מזכים בבינגו ובסקווישי.</li></ol></article>
+      <article><span>🧠 טריוויה</span><ol><li>מתחלקים לקבוצות וקובעים תור משחק.</li><li>בוחרים משבצת לפי קטגוריה ומספר הנקודות.</li><li>עונים בקול לפני שלוחצים על „הצגת התשובה”.</li><li>המארחת מעניקה נקודות לתשובה נכונה; הקבוצה עם הכי הרבה נקודות מנצחת.</li></ol></article>
+    </div>
+  </div>`);
 [[cipherCard,"/cipher",true],[bingoCard,"/bingo",true],[triviaCard,"https://y-jeopardy.vercel.app/",false]].forEach(([card,path,preserveAdmin])=>{
   const url=path+(preserveAdmin&&siteAdmin?"?admin=1":"");
   card.classList.add("game-link");card.tabIndex=0;card.setAttribute("role","link");
@@ -40,6 +49,7 @@ if(isCipherPage){
   document.body.classList.add("game-route");
   document.querySelectorAll("header,.flow,.games,.rules,.finale,footer").forEach(element=>element.hidden=true);
   document.querySelector("#cipher").insertAdjacentHTML("afterbegin",`<a class="game-back" href="/${siteAdmin?"?admin=1":""}">← חזרה לכל המשחקים</a>`);
+  document.querySelector("#cipher .section-title").insertAdjacentHTML("afterend",'<div class="how-to-play"><h3>איך משחקים?</h3><ol><li>הכניסו שם וקבלו כתב סתרים אישי.</li><li>השתמשו במפתח כדי להחליף כל צורה באות. קוראים את החידה מימין לשמאל.</li><li>הקלידו את המשפט המלא ולחצו על „בדיקת פתרון”.</li><li>הראשונ/ה ששולחים פתרון מדויק זוכים בסקווישי הנכסף.</li></ol></div>');
 }
 
 document.querySelector(".rules .golden-rule").insertAdjacentHTML("beforebegin",`

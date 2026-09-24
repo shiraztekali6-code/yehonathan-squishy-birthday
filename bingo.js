@@ -3,6 +3,7 @@ bingoSection.className="section bingo";
 bingoSection.id="bingo";
 bingoSection.innerHTML=`
   <div class="section-title"><span>04</span><div><p>LIVE BINGO · 1–100</p><h2>בינגו סקווישי</h2></div></div>
+  <div class="how-to-play"><h3>איך משחקים?</h3><ol><li>הכניסו שם וקבלו לוח אישי של 5×5 בטלפון.</li><li>המארחת מגרילה מספר בכל לחיצה על גלגל הבינגו.</li><li>מצאו את המספר בלוח ולחצו עליו בעצמכם. אי אפשר לסמן מספר שטרם הוגרל.</li><li>מספר שפספסתם יזהר לאחר ההגרלה הבאה כדי שתוכלו להשלים אותו.</li><li>הראשונ/ה שמשלימים שורה, טור או אלכסון מוכרזים אוטומטית כזוכים.</li></ol></div>
   <div class="bingo-shell">
     <div class="bingo-host" id="bingoHost" hidden>
       <div><span>מצב מארחת</span><h3>גלגל הבינגו</h3><p>לחצי כדי להגריל מספר חדש לכל המסכים.</p></div>
