@@ -8,7 +8,7 @@ bingoSection.innerHTML=`
     <div class="bingo-host" id="bingoHost" hidden>
       <div><span>מצב מארחת</span><h3>גלגל הבינגו</h3><p>לחצי כדי להגריל מספר חדש לכל המסכים.</p></div>
       <div class="bingo-wheel" id="bingoWheel"><strong id="wheelNumber">?</strong></div>
-      <div class="host-buttons"><button id="drawBingo">הגרלת מספר</button><button class="secondary" id="resetBingo">איפוס בינגו</button></div>
+      <div class="host-buttons"><label for="bingoHostCode">קוד מארחת</label><input id="bingoHostCode" type="password" inputmode="numeric" maxlength="12" placeholder="הכניסי קוד"><button id="drawBingo">הגרלת מספר</button><button class="secondary" id="resetBingo">איפוס בינגו</button><small id="bingoHostMessage"></small></div>
     </div>
     <div class="bingo-latest"><span>המספר האחרון</span><strong id="latestBingo">—</strong><small id="drawCount">טרם הוגרלו מספרים</small></div>
     <div class="bingo-history" id="bingoHistory"></div>
@@ -80,7 +80,12 @@ async function bingoApi(body){
   const response=await fetch("/api/bingo",{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});
   const data=await response.json();if(!response.ok)throw new Error(data.error||"משהו השתבש");return data;
 }
-function hostCode(){let code=sessionStorage.getItem("squishyHostCode");if(!code){code=prompt("הכניסי את קוד המארחת")||"";if(code)sessionStorage.setItem("squishyHostCode",code)}return code}
+function hostCode(){
+  const input=document.querySelector("#bingoHostCode");
+  const code=input.value.trim()||sessionStorage.getItem("squishyHostCode")||"";
+  if(!code)document.querySelector("#bingoHostMessage").textContent="הכניסי קודם את קוד המארחת";
+  return code;
+}
 
 document.querySelector("#bingoJoinForm").addEventListener("submit",async event=>{
   event.preventDefault();bingoEls.message.textContent="מכינים לך לוח...";
@@ -93,17 +98,20 @@ async function markBingo(number){
 }
 if(bingoAdmin){
   bingoEls.host.hidden=false;
+  const savedHostCode=sessionStorage.getItem("squishyHostCode");
+  if(savedHostCode)document.querySelector("#bingoHostCode").value=savedHostCode;
   document.querySelector("#drawBingo").addEventListener("click",async()=>{
     const code=hostCode();if(!code)return;
+    const message=document.querySelector("#bingoHostMessage");message.textContent="מגרילה...";
     const button=document.querySelector("#drawBingo");button.disabled=true;bingoEls.wheel.classList.add("spinning");
-    try{const result=await bingoApi({action:"draw",code});await new Promise(resolve=>setTimeout(resolve,900));bingoEls.wheelNumber.textContent=result.number;renderBingoState({drawn:result.drawn,round:bingoPlayer?.round,winner:null})}
-    catch(error){sessionStorage.removeItem("squishyHostCode");alert(error.message)}
+    try{const result=await bingoApi({action:"draw",code});sessionStorage.setItem("squishyHostCode",code);await new Promise(resolve=>setTimeout(resolve,900));bingoEls.wheelNumber.textContent=result.number;renderBingoState({drawn:result.drawn,round:bingoPlayer?.round,winner:null});message.textContent=`הוגרל המספר ${result.number} ✓`}
+    catch(error){sessionStorage.removeItem("squishyHostCode");message.textContent=error.message}
     finally{bingoEls.wheel.classList.remove("spinning");button.disabled=false}
   });
   document.querySelector("#resetBingo").addEventListener("click",async()=>{
     const code=hostCode();if(!code||!confirm("לאפס את כל לוחות הבינגו ולפתוח סבב חדש?"))return;
     try{await bingoApi({action:"reset",code});localStorage.removeItem("squishyBingoPlayer");bingoPlayer=null;bingoDrawn=[];announcedBingoWinner=null;bingoEls.wheelNumber.textContent="?";renderBingoState({drawn:[],round:-1,winner:null});bingoShow("join")}
-    catch(error){sessionStorage.removeItem("squishyHostCode");alert(error.message)}
+    catch(error){sessionStorage.removeItem("squishyHostCode");document.querySelector("#bingoHostMessage").textContent=error.message}
   });
 }
 if(bingoPlayer)bingoShow("boardPanel");
